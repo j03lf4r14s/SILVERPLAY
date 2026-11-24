@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Plataforma de Filmes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --surface-color: #161a29;
+            --accent-color: #00d2ff;
+            --text-main: #ffffff;
+            --text-muted: #8b92a5;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+        /* CABEÇALHO */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            background: rgba(11, 12, 16, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .logo span { color: var(--accent-color); }
+        /* BARRA DE CATEGORIAS */
+        .category-bar {
+            position: fixed;
+            top: 65px;
+            width: 100%;
+            padding: 15px 40px;
+            background: rgba(11, 12, 16, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 99;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .category-bar::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .cat-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        .cat-btn.active {
+            background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+            border: 1px solid transparent;
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+            color: #fff;
+        }
+        /* PLAYER PRINCIPAL */
+        .hero-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 150px auto 30px auto;
+            padding: 0 20px;
+        }
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .video-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .hero-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .hero-title {
+            font-size: 32px;
+            font-weight: 800;
+        }
+        .btn-play {
+            background: var(--accent-color);
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);
+        }
+        /* CATÁLOGO E GRADE DE VÍDEOS */
+        .catalog {
+            padding: 20px 40px 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .row-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .row-title::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .video-card {
+            background: var(--surface-color);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, border 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .video-card:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-color);
+            z-index: 20;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.15);
+        }
+        .card-img-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        /* Fundo escuro com Play para quando não houver capa */
+        .placeholder-cover {
+            background: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .card-info {
+            padding: 12px;
+        }
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        @media (max-width: 768px) {
+            header { padding: 15px 20px; }
+            .category-bar { padding: 10px 20px; top: 55px; }
+            .hero-container { margin-top: 130px; padding: 0 15px; }
+            .hero-info { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .hero-title { font-size: 22px; }
+            .btn-play { width: 100%; }
+            .catalog { padding: 10px 15px 40px 15px; }
+            .video-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Silver<span>Play</span></div>
+    </header>
+    <nav class="category-bar" id="category-bar">
+        <button class="cat-btn active" data-filtro="Todos">✨ Todos</button>
+
+    </nav>
+    <div class="hero-container">
+        <div class="video-wrapper">
+            <iframe id="main-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+
+        <div class="hero-info">
+            <h1 class="hero-title" id="hero-title">Carregando...</h1>
+            <button class="btn-play" onclick="playMainVideo()">▶ Assistir Agora</button>
+        </div>
+    </div>
+    <div class="catalog">
+        <h2 class="row-title" id="titulo-categoria">Mostrando: Todos os Vídeos</h2>
+        <div class="video-grid" id="grid-videos"></div>
+    </div>
+    <script>
+        /* =========================================================
+           👇 CONFIGURAÇÃO DOS SEUS VÍDEOS 👇
+
+           VIMEO – aceita estes formatos:
+           • https://vimeo.com/76979871                  (público)
+           • https://vimeo.com/76979871/a1b2c3d4e5       (não listado – com o hash)
+           • https://vimeo.com/channels/staffpicks/76979871
+           • https://player.vimeo.com/video/76979871
+
+           A capa dos vídeos do Vimeo é buscada automaticamente.
+           Você também pode definir uma capa manual com "capa: 'url'".
+           ========================================================= */
+        const meusVideos = [
+            
+            {
+                titulo: "APPLE TV",
+                sub: "Vimeo • Documentário",
+                categoria: "APPLE TV",
+                link: "https://vimeo.com/1249813502"
+            },
+            {
+                titulo: "LEITURA 360",
+                sub: "Vimeo • Documentário",
+                categoria: "LEITURA 360",
+                link: "https://vimeo.com/1249814247"
+            },
+            {
+                titulo: "O JORNALISTA",
+                sub: "Vimeo • Documentário",
+                categoria: "APPLE TV",
+                link: "https://vimeo.com/1249814358"
+            },
+            {
+                titulo: "CINDIE",
+                sub: "Vimeo • Documentário",
+                categoria: "CINDIE",
+                link: "https://vimeo.com/1249813506"
+            },,
+            {
+                titulo: "DISNEY",
+                sub: "Vimeo • Documentário",
+                categoria: "DISNEY",
+                link: "https://vimeo.com/1249813797"
+            },
+            ,
+            {
+                titulo: "GLOBOPLAY",
+                sub: "Vimeo • Documentário",
+                categoria: "GLOBOPLAY",
+                link: "https://vimeo.com/1249814019"
+            },
+            {
+                titulo: "QUEIMA DIARIA",
+                sub: "Vimeo • Documentário",
+                categoria: "QUEIMA DIARIA",
+                link: "https://vimeo.com/1249814381"
+            },
+            ,
+            {
+                titulo: "DEEZER",
+                sub: "Vimeo • Documentário",
+                categoria: "DEEZER",
+                link: "https://vimeo.com/1249813504"
+            },
+            {
+                titulo: "FLUID",
+                sub: "Vimeo • Documentário",
+                categoria: "FLUID",
+                link: "https://vimeo.com/1249814016"
+            },
+            {
+                titulo: "DOCWAY",
+                sub: "Vimeo • Documentário",
+                categoria: "DOCWAY",
+                link: "https://vimeo.com/1249813895"
+            },
+            {
+                titulo: "UNIVERSAL+",
+                sub: "Vimeo • Documentário",
+                categoria: "UNIVERSAL+",
+                link: "https://vimeo.com/1249814562"
+            },
+            {
+                titulo: "KIDDLE PASS",
+                sub: "Vimeo • Documentário",
+                categoria: "KIDDLE PASS",
+                link: "https://vimeo.com/1249814189"
+            },
+            {
+                titulo: "HOTGO",
+                sub: "Vimeo • Documentário",
+                categoria: "HOTGO",
+                link: "https://vimeo.com/1249814072"
+            },
+            {
+                titulo: "HBO MAX",
+                sub: "Vimeo • Documentário",
+                categoria: "HBO MAX",
+                link: "https://vimeo.com/1249814052"
+            },
+            {
+                titulo: "HUB VANTAGENS",
+                sub: "Vimeo • Documentário",
+                categoria: "HUB VANTAGENS",
+                link: "https://vimeo.com/1249814071"
+            },
+            {
+                titulo: "ESTUDA+",
+                sub: "Vimeo • Documentário",
+                categoria: "ESTUDA+",
+                link: "https://vimeo.com/1249813975"
+            },
+            {
+                titulo: "CURTAON",
+                sub: "Vimeo • Documentário",
+                categoria: "CURTAON",
+                link: "https://vimeo.com/1249813501"
+            }
+           
+        ];
+        /* =========================================================
+           👇 INTELIGÊNCIA DO CÓDIGO (NÃO MEXA) 👇
+           ========================================================= */
+
+        const mainPlayer = document.getElementById('main-player');
+        const heroTitle = document.getElementById('hero-title');
+        const gridVideos = document.getElementById('grid-videos');
+        const tituloCategoria = document.getElementById('titulo-categoria');
+        let currentVideoUrl = "";
+
+        // Cache das capas do Vimeo (evita requisições repetidas)
+        const cacheCapasVimeo = new Map();
+
+        // Extrai ID e hash (se for não listado) de um link do Vimeo
+        function extrairVimeo(url) {
+            const match = url.match(/vimeo\.com\/(?:video\/)?(?:[^\/?#]+\/)*(\d+)(?:\/([a-zA-Z0-9]+))?/)
+                       || url.match(/player\.vimeo\.com\/video\/(\d+)(?:\?h=([a-zA-Z0-9]+))?/);
+            if (!match) return null;
+            return { id: match[1], hash: match[2] || null };
+        }
+
+        // Função que entende o link de todas as plataformas e devolve o link de reprodução
+        function obterLinkDeReproducao(url, autoplay = false) {
+            const autoParam = autoplay ? "&autoplay=1" : "";
+
+
+            // VIMEO (público ou não listado)
+            const vimeo = extrairVimeo(url);
+            if (vimeo) {
+                const h = vimeo.hash ? `&h=${vimeo.hash}` : "";
+                return `https://player.vimeo.com/video/${vimeo.id}?autoplay=${autoplay ? 1 : 0}${h}&title=0&byline=0&portrait=0`;
+            }
+
+            // Se não for nenhum conhecido, tenta usar o link direto (pode não funcionar)
+            return url;
+        }
+
+        // Gera a capa (Miniatura). YouTube e Vimeo são automáticos.
+        function obterCapa(video) {
+            // Se o usuário definiu uma capa manualmente, usa ela
+            if (video.capa) return `<img src="${video.capa}" class="card-img" alt="${video.titulo}">`;
+
+            
+
+            // Se for Vimeo, mostra um placeholder que será trocado pela capa real
+            if (extrairVimeo(video.link)) {
+                return placeholderHTML();
+            }
+
+            // Outras plataformas: fundo escuro com Play
+            return placeholderHTML();
+        }
+
+        function placeholderHTML() {
+            return `
+                <div class="placeholder-cover">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+            `;
+        }
+
+        // Busca a capa oficial do Vimeo usando a API oEmbed (sem chave)
+        async function carregarCapaVimeo(video, container) {
+            try {
+                let thumb = cacheCapasVimeo.get(video.link);
+                if (!thumb) {
+                    const oembedUrl = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(video.link)}&width=640`;
+                    const resp = await fetch(oembedUrl);
+                    if (!resp.ok) throw new Error('oEmbed falhou');
+                    const data = await resp.json();
+                    thumb = data.thumbnail_url;
+                    cacheCapasVimeo.set(video.link, thumb);
+                }
+                if (thumb && container.isConnected) {
+                    container.innerHTML = `<img src="${thumb}" class="card-img" alt="${video.titulo}">`;
+                }
+            } catch (erro) {
+                console.warn('Não foi possível carregar a capa do Vimeo:', erro);
+            }
+        }
+
+        // Função para tocar no player principal
+        function selecionarVideo(url, titulo) {
+            currentVideoUrl = url;
+            mainPlayer.src = obterLinkDeReproducao(url, false);
+            heroTitle.innerText = titulo;
+        }
+
+        function playMainVideo() {
+            if (currentVideoUrl) {
+                mainPlayer.src = obterLinkDeReproducao(currentVideoUrl, true);
+            }
+        }
+
+        // Filtro de Categorias
+        function renderizarVideos(filtro) {
+            gridVideos.innerHTML = '';
+            tituloCategoria.innerText = filtro === "Todos" ? "Mostrando: Todos os Vídeos" : `Categoria: ${filtro}`;
+
+            const videosFiltrados = filtro === "Todos" ? meusVideos : meusVideos.filter(v => v.categoria === filtro);
+
+            if (videosFiltrados.length === 0) {
+                gridVideos.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhum vídeo nesta categoria.</p>';
+                return;
+            }
+
+            // Coloca o primeiro no player automaticamente
+            selecionarVideo(videosFiltrados[0].link, videosFiltrados[0].titulo);
+
+            videosFiltrados.forEach(video => {
+                const card = document.createElement('div');
+                card.className = 'video-card';
+
+                card.innerHTML = `
+                    <div class="card-img-container">
+                        ${obterCapa(video)}
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${video.titulo}</div>
+                        <div class="card-subtitle">${video.sub}</div>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    selecionarVideo(video.link, video.titulo);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+
+                gridVideos.appendChild(card);
+
+                // Se for Vimeo sem capa manual, busca a miniatura real
+                if (!video.capa && extrairVimeo(video.link)) {
+                    carregarCapaVimeo(video, card.querySelector('.card-img-container'));
+                }
+            });
+        }
+
+        // Lógica dos Botões
+        const botoes = document.querySelectorAll('.cat-btn');
+        botoes.forEach(botao => {
+            botao.addEventListener('click', () => {
+                botoes.forEach(b => b.classList.remove('active'));
+                botao.classList.add('active');
+                renderizarVideos(botao.getAttribute('data-filtro'));
+            });
+        });
+
+        renderizarVideos("Todos");
+    </script>
+</body>
+</html>
