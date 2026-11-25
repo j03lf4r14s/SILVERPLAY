@@ -31,6 +31,7 @@
         }
         button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
         a { color: inherit; }
+
         /* ===== CABEÇALHO ===== */
         header {
             position: sticky; top: 0; z-index: 100;
@@ -47,6 +48,7 @@
             outline: none;
         }
         .search:focus-visible { border-color: var(--accent); }
+
         /* ===== CATEGORIAS ===== */
         .category-bar {
             display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none;
@@ -65,22 +67,27 @@
             color: #041316; background: linear-gradient(135deg, #3ee0ff, #1499c4);
             border-color: transparent; box-shadow: 0 8px 18px rgba(62,224,255,.24);
         }
+
         /* ===== HERO (PLAYER + INFORMAÇÕES) ===== */
         .hero {
             --player-h: clamp(480px, calc(100svh - 190px), 860px);
             max-width: 1400px; margin: 0 auto; padding: 14px var(--side) 0;
         }
-        /* Player 9:16 (gravações de tela do celular) */
+        /* Player 9:16 (gravações de tela do celular).
+           --chrome é o espaço ocupado por cabeçalho + categorias acima do vídeo.
+           Assim o player preenche a largura da tela e nunca fica mais alto que o espaço livre. */
         .monitor {
             position: relative; margin: 0 auto;
-            width: min(100%, calc(66vh * 9 / 16));
-            width: min(100%, calc(66svh * 9 / 16));
+            --chrome: 130px;
+            width: min(100%, calc((100vh - var(--chrome)) * 9 / 16));
+            width: min(100%, calc((100svh - var(--chrome)) * 9 / 16));
             aspect-ratio: 9 / 16;
             border-radius: 14px; overflow: hidden; background: #000;
             box-shadow: 0 28px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(224,193,122,.32);
         }
         .video-wrapper { position: absolute; inset: 0; background: #000; }
         .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
         .hero-info { min-width: 0; margin-top: 20px; }
         .kicker { color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
         .hero-title {
@@ -112,6 +119,7 @@
         .btn-play { background: var(--accent); color: #041316; }
         .btn-next { color: var(--text); background: transparent; border: 1px solid rgba(246,241,232,.2); }
         .btn-next:hover { border-color: var(--accent); color: var(--accent); }
+
         /* Lista "A seguir" */
         .up-next { margin-top: 28px; }
         .up-next h2 {
@@ -128,6 +136,7 @@
         .up-next button:hover { border-color: rgba(62,224,255,.5); background: rgba(62,224,255,.06); }
         .up-title { font-size: 15px; font-weight: 600; }
         .up-cat { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
         /* ===== CATÁLOGO ===== */
         .catalog { max-width: 1400px; margin: 0 auto; padding: 40px var(--side) 60px; }
         .row-title {
@@ -180,6 +189,7 @@
             margin-top: 5px; font-size: 13px; line-height: 1.4; color: var(--muted);
         }
         .vazio { grid-column: 1 / -1; padding: 20px 0; color: var(--muted); }
+
         /* ===== COMPUTADOR: player 9:16 à esquerda, informações ao lado ===== */
         @media (min-width: 981px) {
             .hero {
@@ -196,10 +206,25 @@
         }
         /* ===== CELULAR ===== */
         @media (max-width: 980px) {
-            .hero { padding: 10px var(--side) 0; }
+            .hero { --chrome: 132px; padding: 10px var(--side) 0; }
         }
         @media (max-width: 600px) {
-            .search { flex-basis: 100%; max-width: none; }
+            /* Cabeçalho compacto: logo e busca na mesma linha */
+            header { padding: 10px var(--side); gap: 10px; }
+            .logo { font-size: 21px; }
+            .search { flex: 1 1 auto; min-width: 0; max-width: none; padding: 9px 14px; font-size: 15px; }
+            .category-bar { padding: 10px var(--side); }
+            .cat-btn { padding: 8px 15px; font-size: 13px; }
+
+            /* Player ocupando a largura toda da tela (de borda a borda) */
+            .hero { --chrome: 118px; padding: 8px 0 0; }
+            .monitor {
+                width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .hero-info { padding: 18px var(--side) 0; }
+
             .hero-actions .btn { flex: 1 1 100%; }
             .video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
             .card-info { padding: 10px; }
@@ -211,7 +236,9 @@
         <div class="logo">Silver<span>Play</span></div>
         <input class="search" id="busca" type="search" placeholder="Buscar título" aria-label="Buscar título">
     </header>
+
     <nav class="category-bar" id="categorias" aria-label="Categorias"></nav>
+
     <main>
         <section class="hero">
             <div class="monitor">
@@ -222,6 +249,7 @@
                         allowfullscreen></iframe>
                 </div>
             </div>
+
             <div class="hero-info">
                 <p class="kicker">Em cartaz</p>
                 <h1 class="hero-title" id="info-titulo"></h1>
@@ -239,7 +267,6 @@
                 <div class="hero-actions">
                     <button class="btn btn-play" id="btn-play" type="button">▶ Assistir Agora</button>
                     <button class="btn btn-next" id="btn-next" type="button">Próximo</button>
-                    <a class="btn btn-next" id="info-link" href="#" target="_blank" rel="noopener noreferrer">Abrir no Vimeo</a>
                 </div>
                 <section class="up-next" aria-label="Próximos vídeos">
                     <h2>A seguir</h2>
@@ -247,11 +274,13 @@
                 </section>
             </div>
         </section>
+
         <section class="catalog">
             <h2 class="row-title" id="titulo-categoria"></h2>
             <div class="video-grid" id="grid-videos"></div>
         </section>
     </main>
+
     <script>
         /* =========================================================
            👇 CONFIGURAÇÃO DOS SEUS VÍDEOS 👇
@@ -277,6 +306,7 @@
             { titulo: "ESTUDA+", sub: "O Estuda + traz uma série de ebooks elaborados por professores altamente capacitados.", categoria: "ESTUDA+", link: "https://vimeo.com/1249813975" },
             { titulo: "CURTAON", sub: "Um canal independente, dedicado às artes, cultura e humanidades com conteúdos para entreter e aprender.", categoria: "CURTAON", link: "https://vimeo.com/1249813501" }
         ];
+
         /* =========================================================
            👇 CÓDIGO DA PÁGINA 👇
            ========================================================= */
@@ -285,10 +315,12 @@
         const grid = $('grid-videos');
         const categorias = ['Todos', ...new Set(meusVideos.map(v => v.categoria))];
         const cacheCapas = new Map();
+
         let categoria = 'Todos';
         let busca = '';
         let atual = meusVideos[0];
         let autoplay = false;
+
         // Extrai o ID e o código (vídeo não listado) de um link do Vimeo
         function extrairVimeo(url) {
             const id = url.match(/vimeo\.com\/(?:[^?#]*\/)?(\d+)(?=$|[\/?#])/);
@@ -296,6 +328,7 @@
             const hash = url.match(/[?&]h=([a-zA-Z0-9]+)/) || url.match(/vimeo\.com\/(?:video\/)?\d+\/([a-zA-Z0-9]+)/);
             return { id: id[1], hash: hash ? hash[1] : null };
         }
+
         function linkDoPlayer(url, tocar) {
             const v = extrairVimeo(url);
             if (!v) return url;
@@ -303,6 +336,7 @@
             if (v.hash) p.set('h', v.hash);
             return `https://player.vimeo.com/video/${v.id}?${p}`;
         }
+
         // Capa: manual, do cache ou via oEmbed do Vimeo
         async function buscarCapa(video) {
             if (video.capa) return video.capa;
@@ -314,6 +348,7 @@
             cacheCapas.set(video.link, url);
             return url;
         }
+
         const normalizar = t => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const listaDaCategoria = nome => nome === 'Todos' ? meusVideos : meusVideos.filter(v => v.categoria === nome);
         const el = (tag, classe, texto) => {
@@ -322,11 +357,13 @@
             if (texto !== undefined) e.textContent = texto;
             return e;
         };
+
         // Atualiza o player (só recarrega se o endereço mudou)
         function renderPlayer() {
             const url = linkDoPlayer(atual.link, autoplay);
             if (player.getAttribute('src') !== url) player.src = url;
         }
+
         // Atualiza as informações ao lado do player
         function renderInfo() {
             const posicao = meusVideos.indexOf(atual);
@@ -335,7 +372,7 @@
             $('info-desc').textContent = atual.sub;
             $('info-categoria').textContent = atual.categoria;
             $('info-posicao').textContent = `${posicao + 1} de ${meusVideos.length}`;
-            $('info-link').href = atual.link;
+
             const lista = $('proximos');
             lista.innerHTML = '';
             const total = Math.min(3, meusVideos.length - 1);
@@ -350,6 +387,7 @@
                 lista.append(li);
             }
         }
+
         // Marca o card que está tocando
         function marcarCards() {
             grid.querySelectorAll('.video-card').forEach(c => {
@@ -358,6 +396,7 @@
                 c.setAttribute('aria-pressed', ativo);
             });
         }
+
         function selecionar(video, tocar) {
             atual = video;
             autoplay = tocar;
@@ -365,14 +404,18 @@
             renderInfo();
             marcarCards();
         }
+
         function criarCard(video) {
             const card = el('button', 'video-card');
             card.type = 'button';
             card.dataset.link = video.link;
+
             const thumb = el('span', 'thumb');
             thumb.append(el('span', 'play-dot', '▶'), el('span', 'badge', 'SELECIONADO'));
+
             const info = el('span', 'card-info');
             info.append(el('span', 'card-title', video.titulo), el('span', 'card-subtitle', video.sub));
+
             card.append(thumb, info);
             card.onclick = () => {
                 selecionar(video, true);
@@ -381,6 +424,7 @@
             carregarCapa(video, thumb);
             return card;
         }
+
         async function carregarCapa(video, thumb) {
             try {
                 const url = await buscarCapa(video);
@@ -399,6 +443,7 @@
                 console.warn('Capa não carregada:', video.titulo, erro);
             }
         }
+
         // Monta os cards conforme categoria e busca
         function renderGrid() {
             const termo = normalizar(busca.trim());
@@ -409,6 +454,7 @@
             if (!lista.length) grid.append(el('p', 'vazio', 'Nenhum vídeo encontrado.'));
             marcarCards();
         }
+
         // Botões de categoria
         function renderCategorias() {
             const nav = $('categorias');
@@ -421,9 +467,11 @@
             });
             marcarCategoria();
         }
+
         function marcarCategoria() {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.nome === categoria));
         }
+
         function trocarCategoria(nome) {
             categoria = nome;
             marcarCategoria();
@@ -431,15 +479,18 @@
             if (primeiro) selecionar(primeiro, false);
             renderGrid();
         }
+
         $('busca').oninput = e => {
             busca = e.target.value;
             renderGrid();
         };
+
         $('btn-play').onclick = () => selecionar(atual, true);
         $('btn-next').onclick = () => {
             const i = meusVideos.indexOf(atual);
             selecionar(meusVideos[(i + 1) % meusVideos.length], true);
         };
+
         renderCategorias();
         selecionar(atual, false);
         renderGrid();
